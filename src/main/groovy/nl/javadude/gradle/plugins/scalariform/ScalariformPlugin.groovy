@@ -29,6 +29,8 @@ class ScalariformPlugin implements Plugin<Project> {
     def formatAllTask = project.tasks.create("formatAllScala")
 
     project.plugins.withType(JavaBasePlugin) {
+      System.println "project: ${project.name}"
+      System.println "sub-projects: ${project.subprojects}"
       def jpc = project.convention.getPlugin(JavaPluginConvention)
       jpc.sourceSets.all { sourceSet ->
         def task = project.tasks.create(sourceSet.getTaskName("format", "Scala"), Scalariform).configure { t ->
