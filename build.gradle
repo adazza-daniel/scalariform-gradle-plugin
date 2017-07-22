@@ -1,29 +1,28 @@
 plugins {
   id "groovy"
   id "com.github.hierynomus.license" version "0.12.1"
-  id "org.ajoberstar.release-opinion" version "1.4.2"
-  id "com.gradle.plugin-publish" version "0.9.4"
 }
 
 defaultTasks 'build'
 
 group = 'com.hierynomus.gradle.plugins'
 
-repositories { jcenter() }
+repositories {
+  jcenter()
+}
+
+apply from: 'https://raw.githubusercontent.com/adazza/adazza-gradle/master/adazza-bootstrap.gradle'
+apply from: 'https://raw.githubusercontent.com/adazza/adazza-gradle/master/adazza-core.gradle'
 
 dependencies {
   compile gradleApi()
   compile localGroovy()
-  compile "org.scala-lang:scala-library:2.12.1"
-  compile "com.github.machaval:scalariform_2.12:0.2.0"
+  compile "org.scala-lang:scala-library:${scalaInfo[scalaVersion].exactVersion}"
+  compile "org.scalariform:scalariform_$scalaVersion:0.2.2"
   testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
     exclude group: 'org.codehaus.groovy', module: 'groovy-all'
   }
   testCompile 'com.netflix.nebula:nebula-test:3.1.0'
-}
-
-release {
-  grgit = org.ajoberstar.grgit.Grgit.open(project.projectDir)
 }
 
 license {
@@ -51,30 +50,3 @@ if (JavaVersion.current().isJava8Compatible()) {
     options.addStringOption('Xdoclint:none', '-quiet')
   }
 }
-
-task sourcesJar(type: Jar) {
-  from sourceSets.main.allSource
-  classifier = 'sources'
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-  classifier = 'javadoc'
-  from javadoc.destinationDir
-}
-
-artifacts { archives sourcesJar, javadocJar }
-
-pluginBundle {
-  website = "https://github.com/hierynomus/scalariform-gradle-plugin"
-  vcsUrl = "https://github.com/hierynomus/scalariform-gradle-plugin.git"
-  description = "Reformats Scala source code according to your configured conventions"
-  plugins {
-    scalariformPlugin {
-      id = "com.github.hierynomus.scalariform"
-      displayName = "Scalariform plugin for Gradle"
-      tags = [ "gradle", "plugin", "scalariform", "scala", "formatting" ]
-    }
-  }
-}
-
-project.tasks.release.dependsOn project.tasks.publishPlugins
